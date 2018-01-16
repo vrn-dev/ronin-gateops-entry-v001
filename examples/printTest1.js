@@ -35,3 +35,5 @@ Device.open((err) => {
         .close();
     if ( err ) console.log(err);
 });
+
+console.log('closing');
