@@ -20,14 +20,10 @@ const Ticket = require('./models/ticket-model');
 PiGpio.initialize();
 process.on('SIGINT', () => {
     console.log('Received SIGINT.  Press Control-D to exit.');
-});
-
-function handle() {
-    // PiGpioTemp.terminate();
     PiGpio.terminate();
     Device.close();
     console.log('Terminating ....');
-}
+});
 
 const EntryLoop = new Gpio(5, {
     mode: Gpio.INPUT,
@@ -93,8 +89,6 @@ function printTicket() {
     const ticketData = ticketPrinter.ticketData();
     thisBarcode = ticketData.barcode;
     thisIssuedAt = moment(ticketData.issuedAt, 'DDMMYYHHmmss');
-    console.log(thisBarcode);
-    console.log(thisIssuedAt);
     EntryGate.trigger(100, 1);
 }
 
