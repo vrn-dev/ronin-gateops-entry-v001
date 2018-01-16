@@ -1,0 +1,10 @@
+.DS_*
+node_modules
+*.sublime*
+psd
+thumb
+*.log
+package-lock.json
+.idea
+node-custom-pos-0.0.1.tgz
+pigpio_temp

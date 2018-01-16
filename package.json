@@ -1,0 +1,27 @@
+{
+  "name": "ronin-gateops-entry-v001",
+  "version": "0.0.1",
+  "description": "RoninTech Entry Gateops",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vrn-dev/ronin-gateops-entry-v001.git"
+  },
+  "author": "Vaisakh Nair",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vrn-dev/ronin-gateops-entry-v001/issues"
+  },
+  "homepage": "https://github.com/vrn-dev/ronin-gateops-entry-v001#readme",
+  "dependencies": {
+    "iconv-lite": "^0.4.19",
+    "mutable-buffer": "^2.0.3",
+    "usb": "^1.3.1",
+    "lodash": "^4.17.4",
+    "moment": "^2.20.1",
+    "mongoose": "^4.13.9"
+  }
+}
