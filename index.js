@@ -59,6 +59,6 @@ let thisIssuedAt = undefined;
 
 console.log('Ticket Printer Module Acitve. Waiting for inputs....');
 
-EntryLoop.on('interrupt', (level) => {
+EntryLoop.on('interrupt', _.debounce((level) => {
     console.log(level);
-});
+}, 500));
