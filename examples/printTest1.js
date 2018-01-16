@@ -31,7 +31,7 @@ Device.open((err) => {
         .println('Lost Ticket Charge AED 150')
         .setTextItalic('ON')
         .println('Thank You')
-        .cut()
+        .cut('FULL')
         .close();
     if ( err ) console.log(err);
 });
