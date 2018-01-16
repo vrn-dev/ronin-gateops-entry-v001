@@ -75,6 +75,7 @@ ExitLoop.on('interrupt', _.debounce((level) => {
 
     if ( !entryLoopActive && !exitLoopActive ) {
         EntryGate.trigger(100, 1);
+        console.log('Saving Ticket');
         saveTicket();
     }
 
@@ -89,6 +90,8 @@ function printTicket() {
     const ticketData = ticketPrinter.ticketData();
     thisBarcode = ticketData.barcode;
     thisIssuedAt = moment(ticketData.issuedAt, 'DDMMYYHHmmss');
+    console.log(thisBarcode);
+    console.log(thisIssuedAt);
     EntryGate.trigger(100, 1);
 }
 
