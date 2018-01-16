@@ -73,7 +73,7 @@ ExitLoop.on('interrupt', _.debounce((level) => {
         exitLoopActive.isActive = false;
     // if ( !entryLoopActive && exitLoopActive)
 
-    if ( !entryLoopActive && !exitLoopActive ) {
+    if ( !entryLoopActive.isActive && !exitLoopActive.isActive ) {
         EntryGate.trigger(100, 1);
         console.log('Saving Ticket');
         saveTicket();
