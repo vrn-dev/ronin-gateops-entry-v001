@@ -60,5 +60,10 @@ let thisIssuedAt = undefined;
 console.log('Ticket Printer Module Acitve. Waiting for inputs....');
 
 EntryLoop.on('interrupt', _.debounce((level) => {
-    console.log(level);
-}, 500));
+    if ( level === 1 )
+        entryLoopActive.isActive = true;
+    else if ( level === 0 )
+        entryLoopActive.isActive = false;
+}, 100));
+
+setInterval(() => console.log(entryLoopActive.isActive), 500);
