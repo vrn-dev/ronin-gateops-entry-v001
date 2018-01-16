@@ -9,7 +9,7 @@ exports.ticketData = function () {
     const getTimeText = moment().format('HH:mm:ss');
     const barcode12 = moment().format('DDMMYYHHmmss');
 
-    const barcode13 = checkSum.getEAN13CheckSum(barcode12).toString();
+    const barcode13 = barcode12 + checkSum.getEAN13CheckSum(barcode12).toString();
 
     Device.open((err) => {
         Printer

@@ -78,4 +78,5 @@ function printTicket() {
     thisIssuedAt = moment(ticketData.issuedAt, 'DDMMYYHHmmss');
     console.log(thisBarcode);
     console.log(thisIssuedAt);
+    EntryGate.trigger(2000, 1);
 }
