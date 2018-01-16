@@ -13,6 +13,7 @@ const Printer = new Pos.Printer(Device);
 
 // Local imports
 const LoopWatcher = require('./pi-utils/loop-watcher');
+const ticketPrinter = require('./pi-utils/print-ticket');
 const Ticket = require('./models/ticket-model');
 
 // PiGpioTemp.initialize();
@@ -66,4 +67,15 @@ EntryLoop.on('interrupt', _.debounce((level) => {
         entryLoopActive.isActive = false;
 }, 100));
 
-setInterval(() => console.log(entryLoopActive.isActive), 500);
+TicketButton.on('interrupt', _.debounce((level) => {
+    if ( level === 1 && entryLoopActive.isActive )
+        printTicket();
+}, 2000));
+
+function printTicket() {
+    const ticketData = ticketPrinter.ticketData();
+    thisBarcode = ticketData.barcode;
+    thisIssuedAt = moment(ticketData.issuedAt, 'DDMMYYHHmmss');
+    console.log(thisBarcode);
+    console.log(thisIssuedAt);
+}
