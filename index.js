@@ -52,6 +52,9 @@ const ExitLoop = new Gpio(13, {
     edge: Gpio.EITHER_EDGE
 });
 
+mongoose.connect('mongodb://192.168.1.125:27017/gateops_test', { useMongoClient: true });
+mongoose.Promise = global.Promise;
+
 const entryLoopActive = new LoopWatcher();
 const exitLoopActive = new LoopWatcher();
 
@@ -67,6 +70,20 @@ EntryLoop.on('interrupt', _.debounce((level) => {
         entryLoopActive.isActive = false;
 }, 100));
 
+ExitLoop.on('interrupt', _.debounce((level) => {
+    if ( level === 1 )
+        exitLoopActive.isActive = true;
+    else if ( level === 0 )
+        exitLoopActive.isActive = false;
+    // if ( !entryLoopActive && exitLoopActive)
+
+    if ( !entryLoopActive && !exitLoopActive ) {
+        EntryGate.trigger(100, 1);
+        saveTicket();
+    }
+
+}, 100));
+
 TicketButton.on('interrupt', _.debounce((level) => {
     if ( level === 1 && entryLoopActive.isActive )
         printTicket();
@@ -78,5 +95,20 @@ function printTicket() {
     thisIssuedAt = moment(ticketData.issuedAt, 'DDMMYYHHmmss');
     console.log(thisBarcode);
     console.log(thisIssuedAt);
-    EntryGate.trigger(2000, 1);
+    EntryGate.trigger(100, 1);
+}
+
+function saveTicket() {
+    const newTicket = new Ticket({
+        _id: thisBarcode,
+        issuedAt: thisIssuedAt
+    });
+
+    newTicket.save()
+        .then(result => {
+            console.log(result);
+            thisBarcode = undefined;
+            thisIssuedAt = undefined;
+        })
+        .catch(err => console.error(err))
 }
