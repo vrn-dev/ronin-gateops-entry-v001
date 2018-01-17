@@ -57,6 +57,7 @@ const exitLoopActive = new LoopWatcher();
 let thisBarcode = undefined;
 let thisIssuedAt = undefined;
 let thisTicketIssued = false;
+let thisIsTransiting = false;
 
 console.log('Ticket Printer Module Acitve. Waiting for inputs....');
 
@@ -65,6 +66,13 @@ EntryLoop.on('interrupt', _.debounce((level) => {
         entryLoopActive.isActive = true;
     else if ( level === 0 )
         entryLoopActive.isActive = false;
+    if ( thisTicketIssued && !entryLoopActive.isActive && exitLoopActive.isActive ) {
+        console.log('Saving Ticket');
+        saveTicket();
+        thisIsTransiting = true;
+        thisTicketIssued = false;
+    }
+
 }, 100));
 
 ExitLoop.on('interrupt', _.debounce((level) => {
@@ -74,10 +82,9 @@ ExitLoop.on('interrupt', _.debounce((level) => {
         exitLoopActive.isActive = false;
     // if ( !entryLoopActive && exitLoopActive)
 
-    if ( !entryLoopActive.isActive && !exitLoopActive.isActive ) {
+    // if ( !entryLoopActive.isActive && !exitLoopActive.isActive ) {
+    if ( thisIsTransiting && !exitLoopActive.isActive ) {
         EntryGate.trigger(100, 1);
-        console.log('Saving Ticket');
-        saveTicket();
     }
 
 }, 100));
