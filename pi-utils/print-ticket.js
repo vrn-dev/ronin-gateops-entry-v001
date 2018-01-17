@@ -18,7 +18,7 @@ exports.ticketData = function () {
             .setTextBold('ON')
             .setTextUnderline('ON')
             .setTextSize('DOUBLE')
-            .println('RoninTech Parking')
+            .println('Car Value Parking')
             .setTextBold('OFF')
             .setTextUnderline('OFF')
             .setTextSize('NORMAL')
