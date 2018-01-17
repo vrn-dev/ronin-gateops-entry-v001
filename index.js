@@ -56,6 +56,7 @@ const exitLoopActive = new LoopWatcher();
 
 let thisBarcode = undefined;
 let thisIssuedAt = undefined;
+let thisTicketIssued = false;
 
 console.log('Ticket Printer Module Acitve. Waiting for inputs....');
 
@@ -82,7 +83,7 @@ ExitLoop.on('interrupt', _.debounce((level) => {
 }, 100));
 
 TicketButton.on('interrupt', _.debounce((level) => {
-    if ( level === 1 && entryLoopActive.isActive )
+    if ( level === 1 && entryLoopActive.isActive && !thisTicketIssued )
         printTicket();
 }, 2000));
 
@@ -93,6 +94,7 @@ function printTicket() {
     console.log(thisBarcode);
     console.log(thisIssuedAt);
     EntryGate.trigger(100, 1);
+    thisTicketIssued = true;
 }
 
 function saveTicket() {
@@ -106,6 +108,7 @@ function saveTicket() {
             console.log(result);
             thisBarcode = undefined;
             thisIssuedAt = undefined;
+            thisTicketIssued = false;
         })
         .catch(err => console.error(err))
 }
