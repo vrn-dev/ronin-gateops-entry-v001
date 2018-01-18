@@ -38,7 +38,7 @@ logger.info('Initializing...');
 PiGpio.initialize();
 process.on('SIGINT', () => {
     console.log('Received SIGINT.  Press Control-D to exit.');
-    EntryGate.trigger(100, 0);
+    EntryGateOpen.trigger(100, 0);
     PiGpio.terminate();
     Device.close();
     logger.info('Terminating...');
@@ -51,7 +51,12 @@ const EntryLoop = new Gpio(5, {
     edge: Gpio.EITHER_EDGE
 });
 
-const EntryGate = new Gpio(19, {
+const EntryGateOpen = new Gpio(19, {
+    mode: Gpio.OUTPUT,
+    alert: true
+});
+
+const EntryGateClose = new Gpio(26, {
     mode: Gpio.OUTPUT,
     alert: true
 });
@@ -70,7 +75,7 @@ const ExitLoop = new Gpio(13, {
 
 mongoose.connect('mongodb://192.168.1.100:27017/bayTrans_v004', { useMongoClient: true });
 mongoose.Promise = global.Promise;
-logger.log('Connecting to mongodb://192.168.1.100:27017/bayTrans_v004...');
+logger.info('Connecting to mongodb://192.168.1.100:27017/bayTrans_v004...');
 
 const entryLoopActive = new LoopWatcher();
 const exitLoopActive = new LoopWatcher();
@@ -94,7 +99,9 @@ logger.info('Initialized. Waiting for interrupts');
 //});
 
 // Init entry gate relay
-EntryGate.trigger(100, 0);
+EntryGateOpen.digitalWrite(1);
+EntryGateClose.digitalWrite(1);
+
 
 EntryLoop.on('interrupt', _.debounce((level) => {
     if ( level === 0 )
@@ -117,7 +124,8 @@ ExitLoop.on('interrupt', _.debounce((level) => {
         exitLoopActive.isActive = false;
 
     if ( thisIsTransiting && !exitLoopActive.isActive ) {
-        EntryGate.trigger(100, 1);
+        EntryGateClose.digitalWrite(0);
+        setTimeout(() => EntryGateClose.digitalWrite(1));
         thisIsTransiting = false;
     }
 }, 100));
@@ -134,7 +142,8 @@ function printTicket() {
     logger.info('Ticket Issue >>> ' + thisBarcode + thisIssuedAt);
     console.log(thisBarcode);
     console.log(thisIssuedAt);
-    EntryGate.trigger(100, 1);
+    EntryGateOpen.digitalWrite(0);
+    setTimeout(() => EntryGateOpen.digitalWrite(1), 100);
     thisTicketIssued = true;
 }
 
