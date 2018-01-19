@@ -13,6 +13,7 @@ const Device = new Pos.Usb();
 
 // Local imports
 const LoopWatcher = require('./pi-utils/loop-watcher');
+const Flagger = require('./pi-utils/flagger');
 const ticketPrinter = require('./pi-utils/print-ticket');
 const Ticket = require('./models/ticket-model');
 
@@ -83,25 +84,17 @@ const exitLoopActive = new LoopWatcher();
 
 let thisBarcode = undefined;
 let thisIssuedAt = undefined;
-let thisTicketIssued = false;
-let thisIsTransiting = false;
+const ticketIssued = new Flagger();
+const transiting = new Flagger();
+//let thisTicketIssued = false;
+//let thisIsTransiting = false;
 
 console.log('Ticket Printer Module Acitve. Waiting for inputs....');
-logger.info('Initialized. Waiting for interrupts');
-
-//EntryLoop.on('interrupt',(level) => {
-//console.log('entry',level)
-//});
-//ExitLoop.on('interrupt',(level) => {
-//console.log('exit',level)
-//});
-//TicketButton.on('interrupt',(level) => {
-//console.log('btn',level)
-//});
 
 // Init entry gate relay
 EntryGateOpen.digitalWrite(1);
 EntryGateClose.digitalWrite(1);
+logger.info('Initialized. Waiting for interrupts');
 
 
 EntryLoop.on('interrupt', _.debounce((level) => {
@@ -109,12 +102,15 @@ EntryLoop.on('interrupt', _.debounce((level) => {
         entryLoopActive.isActive = true;
     else if ( level === 1 )
         entryLoopActive.isActive = false;
-    if ( thisTicketIssued && !entryLoopActive.isActive && exitLoopActive.isActive ) {
+    //if ( thisTicketIssued && !entryLoopActive.isActive && exitLoopActive.isActive ) {
+    if ( ticketIssued.isTicketIssued && !entryLoopActive.isActive && exitLoopActive.isActive ) {
         console.log('Saving Ticket');
         logger.info('Saving Ticket');
         saveTicket();
-        thisIsTransiting = true;
-        thisTicketIssued = false;
+        //thisIsTransiting = true;
+        //thisTicketIssued = false;
+        transiting.isTransiting(true);
+        ticketIssued.isTicketIssued(false);
     }
 }, 100));
 
@@ -124,15 +120,17 @@ ExitLoop.on('interrupt', _.debounce((level) => {
     else if ( level === 1 )
         exitLoopActive.isActive = false;
 
-    if ( thisIsTransiting && !exitLoopActive.isActive ) {
+    if ( transiting.isTransiting && !exitLoopActive.isActive ) {
         EntryGateClose.digitalWrite(0);
         setTimeout(() => EntryGateClose.digitalWrite(1), 100);
-        thisIsTransiting = false;
+        logger.log('Gate Closed');
+        //thisIsTransiting = false;
+        transiting.isTransiting(false);
     }
 }, 100));
 
 TicketButton.on('interrupt', _.debounce((level) => {
-    if ( level === 1 && entryLoopActive.isActive && !thisTicketIssued )
+    if ( level === 1 && entryLoopActive.isActive && !ticketIssued.isTicketIssued )
         printTicket();
 }, 1000));
 
@@ -145,7 +143,9 @@ function printTicket() {
     console.log(thisIssuedAt);
     EntryGateOpen.digitalWrite(0);
     setTimeout(() => EntryGateOpen.digitalWrite(1), 100);
-    thisTicketIssued = true;
+    logger.info('Gate opened');
+    // thisTicketIssued = true;
+    ticketIssued.isTicketIssued(true);
 }
 
 function saveTicket() {
@@ -157,10 +157,12 @@ function saveTicket() {
     newTicket.save()
         .then(result => {
             console.log(result);
-            logger.info('Ticket saved >>> ' + result);
+            if ( result )
+                logger.info('Ticket saved >>> TicketID : ' + result._id);
             thisBarcode = undefined;
             thisIssuedAt = undefined;
-            thisTicketIssued = false;
+            //thisTicketIssued = false;
+            ticketIssued.isTicketIssued(false);
         })
         .catch(err => {
             logger.error('Error saving ticket to DB ' + err);
