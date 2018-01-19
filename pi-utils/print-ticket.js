@@ -29,7 +29,7 @@ exports.ticketData = function () {
             .feed(2)
             .println('1 Hour AED 15')
             // .println('First 15 Minutes Free')
-            .println('Lost Ticket Charge AED 150')
+            .println('Lost Ticket AED 150')
             .setTextItalic('ON')
             .println('Thank You')
             .cut('FULL')

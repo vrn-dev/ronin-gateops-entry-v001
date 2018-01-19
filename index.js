@@ -38,7 +38,8 @@ logger.info('Initializing...');
 PiGpio.initialize();
 process.on('SIGINT', () => {
     console.log('Received SIGINT.  Press Control-D to exit.');
-    EntryGateOpen.trigger(100, 0);
+    EntryGateOpen.digitalWrite(1);
+    EntryGateClose.digitalWrite(1);
     PiGpio.terminate();
     Device.close();
     logger.info('Terminating...');
@@ -125,7 +126,7 @@ ExitLoop.on('interrupt', _.debounce((level) => {
 
     if ( thisIsTransiting && !exitLoopActive.isActive ) {
         EntryGateClose.digitalWrite(0);
-        setTimeout(() => EntryGateClose.digitalWrite(1));
+        setTimeout(() => EntryGateClose.digitalWrite(1), 100);
         thisIsTransiting = false;
     }
 }, 100));
