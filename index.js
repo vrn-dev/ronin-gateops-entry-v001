@@ -99,9 +99,9 @@ logger.info('Initialized. Waiting for interrupts');
 
 EntryLoop.on('interrupt', _.debounce((level) => {
     if ( level === 0 )
-        entryLoopActive.isActive = true;
+        entryLoopActive.isActive(true);
     else if ( level === 1 )
-        entryLoopActive.isActive = false;
+        entryLoopActive.isActive(false);
     //if ( thisTicketIssued && !entryLoopActive.isActive && exitLoopActive.isActive ) {
     if ( ticketIssued.isTicketIssued && !entryLoopActive.isActive && exitLoopActive.isActive ) {
         console.log('Saving Ticket');
@@ -116,9 +116,9 @@ EntryLoop.on('interrupt', _.debounce((level) => {
 
 ExitLoop.on('interrupt', _.debounce((level) => {
     if ( level === 0 )
-        exitLoopActive.isActive = true;
+        exitLoopActive.isActive(true);
     else if ( level === 1 )
-        exitLoopActive.isActive = false;
+        exitLoopActive.isActive(false);
 
     if ( transiting.isTransiting && !exitLoopActive.isActive ) {
         EntryGateClose.digitalWrite(0);
